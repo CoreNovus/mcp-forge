@@ -1,0 +1,36 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "mcp-forge-aws"
+version = "0.1.0"
+description = "AWS provider implementations for mcp-forge (Bedrock, DynamoDB, CloudWatch, Transcribe)"
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.11"
+authors = [{ name = "Convilyn", email = "dev@convilyn.com" }]
+keywords = ["mcp", "aws", "bedrock", "dynamodb", "agents"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+dependencies = [
+    "mcp-forge-core>=0.1.0",
+    "aioboto3>=12.0",
+    "boto3>=1.28",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "pytest-asyncio>=0.21",
+    "moto[dynamodb,cloudwatch,s3]>=5.0",
+    "ruff>=0.4",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/mcp_forge_aws"]
