@@ -1,15 +1,13 @@
-## Summary
+## What does this PR do?
 
-<!-- What does this PR do? Keep it short. -->
+<!-- A short description. Link to an issue if relevant: Fixes #123 -->
 
-## Changes
+## How to test
 
-- 
+<!-- How can a reviewer verify this works? -->
 
-## Test Plan
+## Checklist
 
-- [ ] `pytest packages/mcp-forge-core/tests/` passes
-- [ ] `pytest packages/mcp-forge-aws/tests/` passes
-- [ ] `pytest packages/mcp-forge-cli/tests/` passes
+- [ ] Tests added or updated
 - [ ] `ruff check packages/` passes
-- [ ] No business-specific references in source code
+- [ ] `pytest` passes for affected package(s)
