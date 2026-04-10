@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from mcp.server.fastmcp import FastMCP
+from mcp_forge_core import create_mcp_app
 
 
 class TestSampleTools:
@@ -10,5 +10,5 @@ class TestSampleTools:
         """Verify tools register without errors."""
         from {{ pkg_name }}.tools import register_tools
 
-        mcp = FastMCP("test")
+        mcp = create_mcp_app("test", "Test server")
         register_tools(mcp)
