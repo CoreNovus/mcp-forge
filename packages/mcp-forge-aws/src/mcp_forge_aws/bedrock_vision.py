@@ -1,13 +1,17 @@
 """Amazon Bedrock Vision provider for mcp-forge.
 
-Structured data extraction from document images using Claude Vision.
-Supports 12 document types with type-specific extraction schemas.
+Structured data extraction from images using Claude Vision.
+You define the extraction types and fields — the framework imposes
+no domain assumptions.
 
 Example::
 
-    vision = BedrockVisionProvider()
-    result = await vision.extract_structured(image_bytes, "receipt")
-    print(result.data)  # {"vendor": "...", "total": "...", ...}
+    schemas = {
+        "product_label": ["brand", "name", "ingredients", "weight"],
+        "floor_plan": ["rooms", "dimensions", "area_sqm"],
+    }
+    vision = BedrockVisionProvider(schemas=schemas)
+    result = await vision.extract_structured(image_bytes, "product_label")
 """
 
 from __future__ import annotations
@@ -22,21 +26,6 @@ import aioboto3
 from mcp_forge_core.providers.vision import BaseVisionProvider, VisionExtractionResult
 
 logger = logging.getLogger(__name__)
-
-_EXTRACTION_SCHEMAS: dict[str, list[str]] = {
-    "receipt": ["store_name", "date", "items", "subtotal", "tax", "total", "payment_method"],
-    "invoice": ["vendor", "invoice_number", "date", "due_date", "line_items", "subtotal", "tax", "total", "currency"],
-    "business_card": ["name", "title", "company", "email", "phone", "address", "website"],
-    "id_document": ["document_type", "full_name", "date_of_birth", "document_number", "expiry_date", "issuing_authority"],
-    "bank_statement": ["bank_name", "account_holder", "account_number", "statement_period", "transactions", "opening_balance", "closing_balance"],
-    "form": ["form_title", "fields", "checkboxes", "signatures"],
-    "menu": ["restaurant_name", "categories", "items", "prices", "currency"],
-    "shipping_label": ["sender", "recipient", "tracking_number", "carrier", "weight", "dimensions"],
-    "lab_result": ["patient_name", "test_date", "tests", "results", "reference_ranges", "lab_name"],
-    "medical_report": ["patient_name", "date", "provider", "diagnosis", "findings", "recommendations"],
-    "inventory": ["items", "quantities", "locations", "categories"],
-    "general": ["content_type", "key_information", "text_content", "tables", "notable_elements"],
-}
 
 
 def _detect_media_type(data: bytes) -> str:
@@ -55,18 +44,26 @@ def _detect_media_type(data: bytes) -> str:
 class BedrockVisionProvider(BaseVisionProvider):
     """Amazon Bedrock Claude Vision provider for structured data extraction.
 
-    Includes 12 pre-configured extraction schemas by default. Pass custom
-    schemas to override or extend.
+    You provide the extraction schemas — a mapping of type names to field
+    lists. The provider sends the image + requested fields to Claude Vision
+    and returns parsed JSON.
 
     Args:
         model_id: Bedrock vision model ID.
         region: AWS region for Bedrock.
         endpoint_url: Optional endpoint override.
         max_tokens: Maximum response tokens.
-        schemas: Custom extraction schemas. Merged with defaults — pass
-                 ``schemas={"custom_type": ["field1", "field2"]}`` to add
-                 new types, or override existing ones.
+        schemas: Extraction type → field list mapping. Defines what
+                 ``extraction_type`` values are valid and what fields
+                 to request for each.
         session: Optional shared aioboto3.Session.
+
+    Example::
+
+        vision = BedrockVisionProvider(schemas={
+            "product": ["brand", "name", "price"],
+            "chart": ["title", "x_axis", "y_axis", "data_points"],
+        })
     """
 
     def __init__(
@@ -82,7 +79,7 @@ class BedrockVisionProvider(BaseVisionProvider):
         self._region = region
         self._endpoint_url = endpoint_url
         self._max_tokens = max_tokens
-        self._schemas = {**_EXTRACTION_SCHEMAS, **(schemas or {})}
+        self._schemas = schemas or {}
         self._session = session or aioboto3.Session()
 
     def _client_kwargs(self) -> dict[str, Any]:
@@ -99,26 +96,34 @@ class BedrockVisionProvider(BaseVisionProvider):
         custom_fields: list[str] | None = None,
         language_hint: str | None = None,
     ) -> VisionExtractionResult:
-        """Extract structured data from a document image using Claude Vision."""
+        """Extract structured data from an image using Claude Vision.
+
+        Either ``custom_fields`` or a matching ``extraction_type`` in the
+        configured schemas must be provided.
+        """
         fields = custom_fields or self._schemas.get(extraction_type)
         if fields is None:
+            if self._schemas:
+                hint = f"Registered types: {', '.join(sorted(self._schemas))}. "
+            else:
+                hint = "No schemas registered. "
             raise ValueError(
                 f"Unknown extraction type '{extraction_type}'. "
-                f"Supported: {', '.join(sorted(self._schemas))}. "
-                f"Or provide custom_fields."
+                f"{hint}"
+                f"Provide custom_fields or register schemas in the constructor."
             )
 
         media_type = _detect_media_type(image_data)
         b64_data = base64.standard_b64encode(image_data).decode("ascii")
 
         system_prompt = (
-            "You are a document data extractor. Extract ONLY information "
+            "You are a structured data extractor. Extract ONLY information "
             "visible in the provided image. Never fabricate data. "
             "Return a JSON object with the requested fields. "
             "If a field is not visible, set it to null."
         )
         if language_hint:
-            system_prompt += f"\nThe document is likely in {language_hint}."
+            system_prompt += f"\nThe content is likely in {language_hint}."
 
         user_content = [
             {"type": "image", "source": {"type": "base64", "media_type": media_type, "data": b64_data}},
@@ -147,7 +152,6 @@ class BedrockVisionProvider(BaseVisionProvider):
         raw_text = response_body["content"][0]["text"]
         usage = response_body.get("usage", {})
 
-        # Parse JSON from response, stripping markdown fences
         data = _parse_json(raw_text)
 
         return VisionExtractionResult(
@@ -159,7 +163,7 @@ class BedrockVisionProvider(BaseVisionProvider):
         )
 
     def get_supported_types(self) -> list[str]:
-        """Return sorted list of supported extraction types."""
+        """Return sorted list of registered extraction types."""
         return sorted(self._schemas)
 
 

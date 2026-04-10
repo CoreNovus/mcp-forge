@@ -1,52 +1,59 @@
 """mcp-forge provider interfaces and built-in implementations.
 
-This module re-exports all provider base classes, data classes, and
-in-memory implementations for convenient imports::
+Top-level exports include infrastructure providers (any server may need)
+and common AI capability examples (LLM, Embedding)::
 
-    from mcp_forge_core.providers import BaseLLMProvider, LLMMessage, LLMResponse
-    from mcp_forge_core.providers import InMemoryCache, InMemorySession
-    from mcp_forge_core.providers import adapt
+    from mcp_forge_core.providers import BaseCacheProvider, InMemoryCache
+    from mcp_forge_core.providers import BaseLLMProvider, LLMMessage
+
+Additional capability providers are available via direct import
+when your server needs them::
+
+    from mcp_forge_core.providers.vision import BaseVisionProvider
+    from mcp_forge_core.providers.transcribe import BaseTranscribeProvider
 """
 
-# Base classes (ABC)
-from .llm import BaseLLMProvider, LLMMessage, LLMResponse
-from .vision import BaseVisionProvider, VisionExtractionResult
-from .embedding import BaseEmbeddingProvider
+# ── Infrastructure providers (any MCP server may need these) ─────────
+
 from .cache import BaseCacheProvider
 from .session import BaseSessionProvider, Session
 from .telemetry import BaseTelemetryProvider
-from .transcribe import BaseTranscribeProvider, TranscriptionResult
 
-# In-memory implementations (for dev/testing)
+# ── In-memory implementations (for dev/testing) ─────────────────────
+
 from .in_memory import InMemoryCache, InMemorySession, InMemoryTelemetry
 
-# Adapter utility
+# ── Common AI capability examples ───────────────────────────────────
+#    Kept at top level as extension pattern references.
+#    Shows how to define a capability provider ABC.
+
+from .llm import BaseLLMProvider, LLMMessage, LLMResponse
+from .embedding import BaseEmbeddingProvider
+
+# ── Adapter utility ─────────────────────────────────────────────────
+
 from .adapt import adapt
 
 __all__ = [
-    # LLM
-    "BaseLLMProvider",
-    "LLMMessage",
-    "LLMResponse",
-    # Vision
-    "BaseVisionProvider",
-    "VisionExtractionResult",
-    # Embedding
-    "BaseEmbeddingProvider",
-    # Cache
+    # Infrastructure
     "BaseCacheProvider",
-    # Session
     "BaseSessionProvider",
     "Session",
-    # Telemetry
     "BaseTelemetryProvider",
-    # Transcribe
-    "BaseTranscribeProvider",
-    "TranscriptionResult",
     # In-memory
     "InMemoryCache",
     "InMemorySession",
     "InMemoryTelemetry",
+    # AI capabilities (extension examples)
+    "BaseLLMProvider",
+    "LLMMessage",
+    "LLMResponse",
+    "BaseEmbeddingProvider",
     # Utility
     "adapt",
 ]
+
+# Note: BaseVisionProvider, BaseTranscribeProvider, and their data classes
+# are available via direct import:
+#   from mcp_forge_core.providers.vision import BaseVisionProvider
+#   from mcp_forge_core.providers.transcribe import BaseTranscribeProvider

@@ -6,9 +6,9 @@ from mcp_forge_core.providers import (
     BaseLLMProvider,
     BaseSessionProvider,
     BaseTelemetryProvider,
-    BaseTranscribeProvider,
-    BaseVisionProvider,
 )
+from mcp_forge_core.providers.vision import BaseVisionProvider
+from mcp_forge_core.providers.transcribe import BaseTranscribeProvider
 
 from mcp_forge_aws import (
     BedrockEmbeddingProvider,

@@ -16,7 +16,7 @@ class VisionExtractionResult:
     """Result of a structured extraction from an image.
 
     Attributes:
-        extraction_type: The type of extraction performed (e.g. "invoice", "receipt").
+        extraction_type: Label describing the extraction performed.
         data: Extracted key-value data.
         input_tokens: Number of input tokens consumed.
         output_tokens: Number of output tokens generated.
@@ -34,15 +34,16 @@ class BaseVisionProvider(ABC):
     """Base class for vision extraction backends.
 
     Subclass and implement :meth:`extract_structured` and :meth:`get_supported_types`
-    to integrate any vision model.
+    to integrate any vision model. The extraction types are entirely defined
+    by your implementation — the framework imposes no domain assumptions.
 
     Example::
 
-        class GPT4VisionProvider(BaseVisionProvider):
+        class ProductVisionProvider(BaseVisionProvider):
             async def extract_structured(self, image_data, extraction_type, **kwargs):
                 ...
             def get_supported_types(self):
-                return ["invoice", "receipt", "document"]
+                return ["product_label", "barcode", "shelf_layout"]
     """
 
     @abstractmethod
@@ -58,7 +59,7 @@ class BaseVisionProvider(ABC):
 
         Args:
             image_data: Raw image bytes (PNG, JPEG, etc.).
-            extraction_type: What to extract (e.g. "invoice", "receipt").
+            extraction_type: What to extract — defined by your implementation.
             custom_fields: Optional list of specific fields to extract.
             language_hint: Optional language hint for OCR/extraction.
 

@@ -67,35 +67,36 @@ class TestParseJson:
 
 
 class TestVisionSchemas:
-    def test_default_supported_types(self):
+    def test_no_default_schemas(self):
+        """Framework should not assume any domain — no built-in schemas."""
         provider = BedrockVisionProvider()
+        assert provider.get_supported_types() == []
+
+    def test_user_provided_schemas(self):
+        schemas = {
+            "product": ["brand", "name", "price"],
+            "chart": ["title", "x_axis", "data_points"],
+        }
+        provider = BedrockVisionProvider(schemas=schemas)
         types = provider.get_supported_types()
-        assert "receipt" in types
-        assert "invoice" in types
-        assert "general" in types
-        assert types == sorted(types)  # alphabetically sorted
+        assert "product" in types
+        assert "chart" in types
+        assert types == sorted(types)
 
-    def test_custom_schemas_merged(self):
-        provider = BedrockVisionProvider(schemas={"x_ray": ["bones", "fractures"]})
-        types = provider.get_supported_types()
-        assert "x_ray" in types
-        assert "receipt" in types  # defaults preserved
-
-    def test_custom_schema_overrides_default(self):
-        custom_receipt = ["store", "total"]
-        provider = BedrockVisionProvider(schemas={"receipt": custom_receipt})
-        # The custom schema should override the default one
-        # We can't inspect _schemas directly but can verify it's in types
-        assert "receipt" in provider.get_supported_types()
-
-    def test_unknown_type_raises(self):
+    def test_unknown_type_with_no_schemas_raises(self):
         provider = BedrockVisionProvider()
-        with pytest.raises(ValueError, match="Unknown extraction type"):
-            # Can't actually call extract_structured without AWS,
-            # but we can verify the schema validation via custom_fields=None
+        with pytest.raises(ValueError, match="No schemas registered"):
             import asyncio
             asyncio.get_event_loop().run_until_complete(
-                provider.extract_structured(b"img", "nonexistent_type")
+                provider.extract_structured(b"img", "anything")
+            )
+
+    def test_unknown_type_with_schemas_shows_registered(self):
+        provider = BedrockVisionProvider(schemas={"product": ["name"]})
+        with pytest.raises(ValueError, match="product"):
+            import asyncio
+            asyncio.get_event_loop().run_until_complete(
+                provider.extract_structured(b"img", "unknown_type")
             )
 
 

@@ -12,14 +12,14 @@ from mcp_forge_core.providers import (
     BaseLLMProvider,
     BaseSessionProvider,
     BaseTelemetryProvider,
-    BaseTranscribeProvider,
-    BaseVisionProvider,
     InMemoryCache,
     InMemorySession,
     InMemoryTelemetry,
     Session,
     adapt,
 )
+from mcp_forge_core.providers.vision import BaseVisionProvider
+from mcp_forge_core.providers.transcribe import BaseTranscribeProvider
 
 
 # ── ABC Enforcement ──────────────────────────────────────────────────
