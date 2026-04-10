@@ -1,0 +1,15 @@
+# Workspace root — not a package itself.
+# Each package in packages/ has its own pyproject.toml.
+#
+# Development:
+#   pip install -e packages/mcp-forge-core
+#   pip install -e packages/mcp-forge-aws
+#   pip install -e packages/mcp-forge-cli
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["packages/*/tests"]
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
