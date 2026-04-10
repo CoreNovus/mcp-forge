@@ -25,6 +25,11 @@ dependencies = [
     "mcp>=1.0,<2.0",
 ]
 
+[project.urls]
+Homepage = "https://github.com/convilyn/mcp-forge"
+Repository = "https://github.com/convilyn/mcp-forge"
+Issues = "https://github.com/convilyn/mcp-forge/issues"
+
 [project.optional-dependencies]
 aws = ["mcp-forge-aws"]
 dev = [

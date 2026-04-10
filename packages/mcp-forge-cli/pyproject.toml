@@ -24,6 +24,10 @@ dependencies = [
     "jinja2>=3.0,<4.0",
 ]
 
+[project.urls]
+Homepage = "https://github.com/convilyn/mcp-forge"
+Repository = "https://github.com/convilyn/mcp-forge"
+
 [project.optional-dependencies]
 dev = [
     "pytest>=7.0",

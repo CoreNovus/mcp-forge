@@ -171,11 +171,12 @@ mcp-forge/
 git clone https://github.com/convilyn/mcp-forge.git
 cd mcp-forge
 
-pip install -e packages/mcp-forge-core[dev]
-pip install -e packages/mcp-forge-aws[dev]
-pip install -e packages/mcp-forge-cli[dev]
+# Install all packages in dev mode (uv recommended, pip also works)
+uv pip install -e packages/mcp-forge-core[dev]
+uv pip install -e packages/mcp-forge-aws[dev]
+uv pip install -e packages/mcp-forge-cli[dev]
 
-# Run tests
+# Run tests (each package independently)
 pytest packages/mcp-forge-core/tests/
 pytest packages/mcp-forge-aws/tests/
 pytest packages/mcp-forge-cli/tests/
