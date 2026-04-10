@@ -122,7 +122,7 @@ def run_server(
 
         logger.info("Starting %s on %s:%d (stateless=%s)", mcp.name, actual_host, actual_port, stateless)
 
-        app = mcp.http_app(stateless_http=stateless, json_response=True)
+        app = _get_http_app(mcp, stateless=stateless)
 
         import uvicorn
 
@@ -151,4 +151,28 @@ def get_http_app(
         mcp = create_mcp_app("my-server", "Description")
         app = get_http_app(mcp)  # pass to Lambda handler, gunicorn, etc.
     """
-    return mcp.http_app(stateless_http=stateless, json_response=True)
+    return _get_http_app(mcp, stateless=stateless)
+
+
+def _get_http_app(mcp: FastMCP, *, stateless: bool = True) -> Any:
+    """Resolve the correct HTTP app method across MCP SDK versions.
+
+    The MCP SDK uses ``streamable_http_app()`` while the standalone
+    fastmcp package uses ``http_app()``. This helper handles both.
+    """
+    # MCP SDK >= 1.x: streamable_http_app()
+    if hasattr(mcp, "streamable_http_app"):
+        return mcp.streamable_http_app()
+
+    # Standalone fastmcp package: http_app()
+    if hasattr(mcp, "http_app"):
+        return mcp.http_app(stateless_http=stateless, json_response=True)
+
+    # Fallback: SSE app
+    if hasattr(mcp, "sse_app"):
+        return mcp.sse_app()
+
+    raise AttributeError(
+        f"FastMCP instance has no HTTP app method. "
+        f"Available: {[m for m in dir(mcp) if 'app' in m.lower()]}"
+    )
