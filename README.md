@@ -4,6 +4,18 @@ A framework for building production-ready MCP servers with swappable providers.
 
 Scaffold a new server in seconds, swap cache/session/telemetry backends without changing tool code.
 
+## Why mcp-forge?
+
+AI can generate an MCP server from scratch — but every server ends up with its own caching logic, its own error handling, its own telemetry wiring. When you maintain 3+ servers, the inconsistency becomes a tax.
+
+mcp-forge solves the **second server problem**:
+
+- **`ToolContext`** — cache-aside + telemetry + result compaction in one object. Born from real pain: production MCP servers where every tool repeated 20+ lines of the same boilerplate.
+- **`@measured` / `@cached_tool` / `@compacted`** — three composable decorators that stack. Write your business logic, the framework handles the rest.
+- **`run_server(mcp)`** — one call replaces the 40-line HTTP/stdio mode-switching block that every server copy-pastes.
+- **Django Backend Pattern (ABC)** — chosen specifically because AI coding assistants generate better code when they see `class MyCache(BaseCacheProvider)` than when they see a Protocol stub. Instant `TypeError` on missing methods, IDE auto-stubs, docstring propagation.
+- **Swap backends, not code** — `InMemoryCache` for local dev, `DynamoDBCacheProvider` for production. Same tool code, zero changes.
+
 ## Install
 
 ```bash
@@ -168,20 +180,9 @@ mcp-forge/
 ## Development
 
 ```bash
-git clone https://github.com/convilyn/mcp-forge.git
-cd mcp-forge
-
-# Install all packages in dev mode (uv recommended, pip also works)
-uv pip install -e packages/mcp-forge-core[dev]
-uv pip install -e packages/mcp-forge-aws[dev]
-uv pip install -e packages/mcp-forge-cli[dev]
-
-# Run tests (each package independently)
-pytest packages/mcp-forge-core/tests/
-pytest packages/mcp-forge-aws/tests/
-pytest packages/mcp-forge-cli/tests/
-
-# Lint
+git clone https://github.com/convilyn/mcp-forge.git && cd mcp-forge
+uv pip install -e packages/mcp-forge-core[dev] -e packages/mcp-forge-aws[dev] -e packages/mcp-forge-cli[dev]
+pytest packages/mcp-forge-core/tests/ packages/mcp-forge-aws/tests/ packages/mcp-forge-cli/tests/
 ruff check packages/
 ```
 
