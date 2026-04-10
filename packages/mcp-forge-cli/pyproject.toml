@@ -25,8 +25,8 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/convilyn/mcp-forge"
-Repository = "https://github.com/convilyn/mcp-forge"
+Homepage = "https://github.com/CoreNovus/mcp-forge"
+Repository = "https://github.com/CoreNovus/mcp-forge"
 
 [project.optional-dependencies]
 dev = [

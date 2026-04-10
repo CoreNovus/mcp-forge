@@ -26,9 +26,9 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/convilyn/mcp-forge"
-Repository = "https://github.com/convilyn/mcp-forge"
-Issues = "https://github.com/convilyn/mcp-forge/issues"
+Homepage = "https://github.com/CoreNovus/mcp-forge"
+Repository = "https://github.com/CoreNovus/mcp-forge"
+Issues = "https://github.com/CoreNovus/mcp-forge/issues"
 
 [project.optional-dependencies]
 aws = ["mcp-forge-aws"]

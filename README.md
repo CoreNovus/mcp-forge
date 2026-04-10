@@ -180,7 +180,7 @@ mcp-forge/
 ## Development
 
 ```bash
-git clone https://github.com/convilyn/mcp-forge.git && cd mcp-forge
+git clone https://github.com/CoreNovus/mcp-forge.git && cd mcp-forge
 uv pip install -e packages/mcp-forge-core[dev] -e packages/mcp-forge-aws[dev] -e packages/mcp-forge-cli[dev]
 pytest packages/mcp-forge-core/tests/ packages/mcp-forge-aws/tests/ packages/mcp-forge-cli/tests/
 ruff check packages/
