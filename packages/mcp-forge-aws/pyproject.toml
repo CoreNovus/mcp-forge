@@ -9,7 +9,7 @@ description = "AWS provider implementations for mcp-forge (Bedrock, DynamoDB, Cl
 readme = "README.md"
 license = "MIT"
 requires-python = ">=3.11"
-authors = [{ name = "Convilyn", email = "dev@convilyn.com" }]
+authors = [{ name = "mcp-forge contributors" }]
 keywords = ["mcp", "aws", "bedrock", "dynamodb", "agents"]
 classifiers = [
     "Development Status :: 3 - Alpha",

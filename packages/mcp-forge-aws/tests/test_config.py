@@ -44,12 +44,12 @@ class TestAWSConfig:
         assert "us-west-2" in r
 
     def test_subclass_adds_fields(self):
-        """Verify the Convilyn-style config extension pattern works."""
+        """Verify the config extension pattern works."""
 
-        class ResumeConfig(AWSConfig):
-            cache_table: str = "resume-cache"
-            bedrock_extraction_model_id: str = "us.anthropic.claude-haiku-4-5-20251001-v1:0"
+        class MyServerConfig(AWSConfig):
+            cache_table: str = "my-cache"
+            extraction_model_id: str = "us.anthropic.claude-haiku-4-5-20251001-v1:0"
 
-        config = ResumeConfig()
-        assert config.cache_table == "resume-cache"
+        config = MyServerConfig()
+        assert config.cache_table == "my-cache"
         assert config.aws_region == "us-east-1"  # inherited

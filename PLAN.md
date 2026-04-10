@@ -219,7 +219,7 @@ pip install mcp-forge-cli             # CLI tool
 
 ### 5. CLI has no cloud assumptions
 - `--output-dir` instead of hardcoded project root
-- `--author` / `--email` instead of hardcoded "Convilyn"
+- `--author` / `--email` instead of hardcoded values
 - `--templates` for custom template directory
 - RegistryTarget Protocol for pluggable registry (not hardcoded to servers.json)
 
@@ -264,31 +264,7 @@ pip install mcp-forge-cli             # CLI tool
 
 ---
 
-## Convilyn Integration (stays in convilyn-wf-correctness repo)
-
-After the open-source packages are published:
-
-```
-convilyn-wf-correctness/mcp_server/
-├── mcp-shared/                    # Thin bridge layer
-│   └── src/mcp_shared/
-│       ├── __init__.py            # Re-exports from mcp_forge_core + mcp_forge_aws
-│       └── compat.py              # Convilyn-specific wrappers (if any)
-│
-├── mcp-forge-convilyn/            # Convilyn CLI plugin
-│   └── src/mcp_forge_convilyn/
-│       ├── plugin.py              # ForgePlugin implementation
-│       ├── targets/
-│       │   ├── servers_json.py    # RegistryTarget → servers.json
-│       │   └── router_catalog.py  # RegistryTarget → router.py
-│       └── templates/             # Convilyn-specific templates (import mcp_shared)
-│
-└── {name}-mcp/                    # Individual MCP servers (no change)
-```
-
----
-
-## AWS → GCP/Azure Migration Path
+## Cloud Migration Path
 
 With provider interfaces in place:
 

@@ -18,4 +18,4 @@ mcp = create_mcp_app("my-server", "A helpful MCP server")
 mcp.run()
 ```
 
-See the [mcp-forge documentation](https://github.com/convilyn/mcp-forge) for full details.
+See the [mcp-forge repository](https://github.com/mcp-forge/mcp-forge) for full details.

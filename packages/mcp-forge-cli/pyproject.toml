@@ -9,7 +9,7 @@ description = "CLI scaffold tool for mcp-forge — generate MCP server projects 
 readme = "README.md"
 license = "MIT"
 requires-python = ">=3.11"
-authors = [{ name = "Convilyn", email = "dev@convilyn.com" }]
+authors = [{ name = "mcp-forge contributors" }]
 keywords = ["mcp", "scaffold", "cli", "agents", "code-generator"]
 classifiers = [
     "Development Status :: 3 - Alpha",

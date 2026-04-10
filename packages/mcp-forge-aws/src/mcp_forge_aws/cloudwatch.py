@@ -7,7 +7,7 @@ Example::
 
     telemetry = CloudWatchTelemetryProvider(
         namespace="MyApp/MCP",
-        server_name="resume-mcp",
+        server_name="my-server-mcp",
     )
     await telemetry.emit_metric("tool.invocation", 1.0, "Count")
 

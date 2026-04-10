@@ -16,7 +16,7 @@ health checks and provider injection via closures.
     if __name__ == "__main__":
         run_server(mcp)
 
-**With providers (Convilyn-style):**
+**With providers:**
 
     from mcp_forge_core import create_mcp_app, run_server, ToolContext
     from mcp_forge_core.providers import InMemoryCache, InMemoryTelemetry

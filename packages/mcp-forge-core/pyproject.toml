@@ -9,7 +9,7 @@ description = "Protocol-based framework for building MCP servers — clean inter
 readme = "README.md"
 license = "MIT"
 requires-python = ">=3.11"
-authors = [{ name = "Convilyn", email = "dev@convilyn.com" }]
+authors = [{ name = "mcp-forge contributors" }]
 keywords = ["mcp", "model-context-protocol", "agents", "llm", "framework"]
 classifiers = [
     "Development Status :: 3 - Alpha",
