@@ -58,7 +58,7 @@ class MCPServerConfig(BaseSettings):
     )
 
     # ── Network ──────────────────────────────────────────────────────
-    server_host: str = Field(default="0.0.0.0", description="HTTP server bind host")
+    server_host: str = Field(default="127.0.0.1", description="HTTP server bind host")
     server_port: int = Field(default=8000, description="HTTP server port")
 
     # ── Session ──────────────────────────────────────────────────────

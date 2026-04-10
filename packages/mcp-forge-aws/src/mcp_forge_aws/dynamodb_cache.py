@@ -23,6 +23,7 @@ import time
 from typing import Any
 
 import boto3
+from botocore.exceptions import BotoCoreError, ClientError
 
 from mcp_forge_core.providers.cache import BaseCacheProvider
 
@@ -76,7 +77,7 @@ class DynamoDBCacheProvider(BaseCacheProvider):
                 ttl_val = int(item.get("ttl", {}).get("N", "0"))
                 if ttl_val > time.time():
                     return json.loads(item[self._data_field]["S"])
-        except Exception as e:
+        except (ClientError, BotoCoreError) as e:
             logger.warning("Cache get failed (non-fatal): %s", e)
         return None
 
@@ -93,7 +94,7 @@ class DynamoDBCacheProvider(BaseCacheProvider):
                     "ttl": {"N": str(int(time.time()) + ttl)},
                 },
             )
-        except Exception as e:
+        except (ClientError, BotoCoreError) as e:
             logger.warning("Cache put failed (non-fatal): %s", e)
 
     async def delete(self, key: str) -> bool:
@@ -106,7 +107,7 @@ class DynamoDBCacheProvider(BaseCacheProvider):
                 ReturnValues="ALL_OLD",
             )
             return "Attributes" in response
-        except Exception as e:
+        except (ClientError, BotoCoreError) as e:
             logger.warning("Cache delete failed (non-fatal): %s", e)
             return False
 

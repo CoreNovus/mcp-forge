@@ -49,6 +49,30 @@ def validate_server_name(name: str) -> str | None:
     return None
 
 
+def validate_text_field(value: str, field_name: str) -> str | None:
+    """Validate a text field that will be interpolated into generated files.
+
+    Rejects characters that could break Python string literals or TOML values.
+
+    Args:
+        value: The value to validate.
+        field_name: Field name for error messages.
+
+    Returns:
+        Error message string if invalid, None if valid.
+    """
+    if not value:
+        return None
+
+    dangerous = {'"', "\n", "\r", "\\"}
+    found = [ch for ch in value if ch in dangerous]
+    if found:
+        chars = ", ".join(repr(ch) for ch in set(found))
+        return f"{field_name} contains unsafe characters: {chars}"
+
+    return None
+
+
 def validate_output_dir(path: str, server_name: str) -> str | None:
     """Check if the output directory would conflict with existing files.
 

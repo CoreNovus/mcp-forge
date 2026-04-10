@@ -117,7 +117,7 @@ def run_server(
         logger.info("Starting %s in stdio mode", mcp.name)
         mcp.run(transport="stdio")
     else:
-        actual_host = host or os.environ.get("MCP_SERVER_HOST", "0.0.0.0")
+        actual_host = host or os.environ.get("MCP_SERVER_HOST", "127.0.0.1")
         actual_port = port or int(os.environ.get("MCP_SERVER_PORT", "8000"))
 
         logger.info("Starting %s on %s:%d (stateless=%s)", mcp.name, actual_host, actual_port, stateless)

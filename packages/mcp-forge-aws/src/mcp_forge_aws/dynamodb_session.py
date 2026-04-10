@@ -21,6 +21,7 @@ from datetime import datetime, timezone
 from typing import Any
 
 import boto3
+from botocore.exceptions import BotoCoreError, ClientError
 
 from mcp_forge_core.providers.session import BaseSessionProvider, Session
 
@@ -79,7 +80,7 @@ class DynamoDBSessionProvider(BaseSessionProvider):
                 updated_at=item.get("updated_at", {}).get("S", ""),
                 ttl=ttl_val,
             )
-        except Exception as e:
+        except (ClientError, BotoCoreError) as e:
             logger.warning("Session get failed: %s", e)
             return None
 
@@ -101,7 +102,7 @@ class DynamoDBSessionProvider(BaseSessionProvider):
                     "ttl": {"N": str(int(time.time()) + self._ttl_seconds)},
                 },
             )
-        except Exception as e:
+        except (ClientError, BotoCoreError) as e:
             logger.warning("Session save failed: %s", e)
 
     async def delete(self, session_id: str) -> bool:
@@ -114,7 +115,7 @@ class DynamoDBSessionProvider(BaseSessionProvider):
                 ReturnValues="ALL_OLD",
             )
             return "Attributes" in response
-        except Exception as e:
+        except (ClientError, BotoCoreError) as e:
             logger.warning("Session delete failed: %s", e)
             return False
 
