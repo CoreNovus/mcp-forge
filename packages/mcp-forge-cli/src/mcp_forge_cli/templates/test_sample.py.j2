@@ -1,0 +1,14 @@
+"""Tests for sample tools."""
+
+from __future__ import annotations
+
+from mcp.server.fastmcp import FastMCP
+
+
+class TestSampleTools:
+    def test_tools_register(self):
+        """Verify tools register without errors."""
+        from {{ pkg_name }}.tools import register_tools
+
+        mcp = FastMCP("test")
+        register_tools(mcp)

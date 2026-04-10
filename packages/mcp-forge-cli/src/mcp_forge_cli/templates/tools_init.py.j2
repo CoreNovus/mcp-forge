@@ -1,0 +1,17 @@
+"""Tool registration for {{ server_name }}."""
+
+from .sample import register_sample_tools
+
+
+def register_tools(mcp) -> None:
+    """Register all tools on the FastMCP instance.
+
+    Add new tool modules here as your server grows::
+
+        from .my_feature import register_my_feature_tools
+
+        def register_tools(mcp) -> None:
+            register_sample_tools(mcp)
+            register_my_feature_tools(mcp)
+    """
+    register_sample_tools(mcp)

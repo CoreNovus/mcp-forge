@@ -1,0 +1,28 @@
+"""{{ description }}
+
+Usage:
+    # HTTP mode (default — for Lambda / production)
+    python -m {{ pkg_name }}.server
+
+    # Stdio mode (for local development / Claude Desktop)
+    MCP_SERVER_MODE=stdio python -m {{ pkg_name }}.server
+"""
+
+from mcp_forge_core import create_mcp_app, run_server
+
+from .config import settings
+from .tools import register_tools
+
+mcp = create_mcp_app(
+    server_name=settings.server_name,
+    description="{{ description }}",
+    tool_modules=[register_tools],
+)
+
+
+def main() -> None:
+    run_server(mcp)
+
+
+if __name__ == "__main__":
+    main()

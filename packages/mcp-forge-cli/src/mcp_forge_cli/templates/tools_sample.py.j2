@@ -1,0 +1,62 @@
+"""Sample tool — replace with your own tools.
+
+Each tool is a decorated async function. The docstring becomes the tool
+description that Claude sees. Keep it clear and specific.
+
+To add providers (caching, LLM, etc.), use the closure pattern::
+
+    from mcp_forge_core.providers import InMemoryCache
+
+    cache = InMemoryCache()
+
+    def register_tools(mcp):
+        @mcp.tool()
+        async def cached_search(query: str) -> dict:
+            hit = await cache.get(query)
+            if hit:
+                return hit
+            result = {"query": query, "answer": "..."}
+            await cache.put(query, result, ttl_seconds=3600)
+            return result
+"""
+
+from __future__ import annotations
+
+import logging
+
+logger = logging.getLogger(__name__)
+
+
+def register_sample_tools(mcp) -> None:
+    """Register sample tools on the FastMCP instance."""
+
+    @mcp.tool()
+    async def hello(name: str) -> str:
+        """Say hello to someone.
+
+        Args:
+            name: The person's name.
+
+        Returns:
+            A friendly greeting.
+        """
+        logger.info("hello called with name=%s", name)
+        return f"Hello, {name}! Welcome to {{ server_name }}."
+
+    @mcp.tool()
+    async def echo(message: str, uppercase: bool = False) -> dict:
+        """Echo a message back, optionally in uppercase.
+
+        Args:
+            message: The message to echo.
+            uppercase: If true, convert the message to uppercase.
+
+        Returns:
+            Dict with the original and processed message.
+        """
+        processed = message.upper() if uppercase else message
+        return {
+            "original": message,
+            "processed": processed,
+            "server": "{{ server_name }}",
+        }

@@ -1,0 +1,17 @@
+"""Shared test fixtures for {{ server_name }}."""
+
+from __future__ import annotations
+
+import pytest
+
+from mcp_forge_core.providers import InMemoryCache, InMemoryTelemetry
+
+
+@pytest.fixture
+def cache():
+    return InMemoryCache()
+
+
+@pytest.fixture
+def telemetry():
+    return InMemoryTelemetry()

@@ -1,0 +1,23 @@
+"""Configuration for {{ server_name }}.
+
+All settings can be overridden via environment variables with the MCP_ prefix.
+Example: MCP_SERVER_NAME={{ server_name }} MCP_LOG_LEVEL=DEBUG
+"""
+
+from mcp_forge_core.config import MCPServerConfig
+
+
+class Settings(MCPServerConfig):
+    """Server-specific settings.
+
+    Extend this class to add your own configuration fields::
+
+        class Settings(MCPServerConfig):
+            my_api_key: str = ""
+            max_results: int = 10
+    """
+
+    server_name: str = "{{ server_name }}"
+
+
+settings = Settings()
