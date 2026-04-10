@@ -1,0 +1,40 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "mcp-forge-cli"
+version = "0.1.0"
+description = "CLI scaffold tool for mcp-forge — generate MCP server projects in seconds"
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.11"
+authors = [{ name = "Convilyn", email = "dev@convilyn.com" }]
+keywords = ["mcp", "scaffold", "cli", "agents", "code-generator"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+dependencies = [
+    "mcp-forge-core>=0.1.0",
+    "click>=8.0,<9.0",
+    "jinja2>=3.0,<4.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "ruff>=0.4",
+]
+
+[project.scripts]
+mcp-forge = "mcp_forge_cli.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/mcp_forge_cli"]
+
+[tool.hatch.build]
+artifacts = ["src/mcp_forge_cli/templates/**"]
