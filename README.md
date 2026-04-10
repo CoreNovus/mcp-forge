@@ -2,7 +2,7 @@
 
 A framework for building production-ready MCP servers with swappable providers.
 
-Scaffold a new server in seconds, swap cache/session/telemetry backends without changing tool code, and deploy to any cloud.
+Scaffold a new server in seconds, swap cache/session/telemetry backends without changing tool code.
 
 ## Install
 
