@@ -70,14 +70,8 @@ class BedrockLLMProvider(BaseLLMProvider):
         Supports both text and multimodal content blocks in messages.
         """
         bedrock_messages = [
-            {"role": m.role, "content": m.content if isinstance(m.content, str) else m.content}
-            for m in messages
+            {"role": m.role, "content": m.content} for m in messages
         ]
-
-        # Convert plain string content to Messages API format
-        for msg in bedrock_messages:
-            if isinstance(msg["content"], str):
-                msg["content"] = msg["content"]
 
         body = {
             "anthropic_version": "bedrock-2023-05-31",

@@ -50,7 +50,7 @@ class TestScaffold:
         )
         MCPServerScaffold(config).generate()
 
-        content = (tmp_path / "demo-mcp" / "pyproject.toml").read_text()
+        content = (tmp_path / "demo-mcp" / "pyproject.toml").read_text(encoding="utf-8")
         assert 'name = "demo-mcp"' in content
         assert "Alice" in content
         assert "alice@example.com" in content
@@ -60,7 +60,7 @@ class TestScaffold:
         config = ScaffoldConfig(server_name="api-mcp", output_dir=str(tmp_path))
         MCPServerScaffold(config).generate()
 
-        content = (tmp_path / "api-mcp" / "src" / "api_mcp" / "server.py").read_text()
+        content = (tmp_path / "api-mcp" / "src" / "api_mcp" / "server.py").read_text(encoding="utf-8")
         assert "from mcp_forge_core import create_mcp_app" in content
         assert "from mcp_forge_core import" in content
 
@@ -68,7 +68,7 @@ class TestScaffold:
         config = ScaffoldConfig(server_name="cfg-mcp", output_dir=str(tmp_path))
         MCPServerScaffold(config).generate()
 
-        content = (tmp_path / "cfg-mcp" / "src" / "cfg_mcp" / "config.py").read_text()
+        content = (tmp_path / "cfg-mcp" / "src" / "cfg_mcp" / "config.py").read_text(encoding="utf-8")
         assert "MCPServerConfig" in content
         assert "cfg-mcp" in content
 
@@ -85,7 +85,7 @@ class TestScaffold:
         assert len(py_files) > 0
 
         for py_file in py_files:
-            source = py_file.read_text()
+            source = py_file.read_text(encoding="utf-8")
             try:
                 ast.parse(source)
             except SyntaxError as e:
@@ -99,7 +99,7 @@ class TestScaffold:
         )
         MCPServerScaffold(config).generate()
 
-        content = (tmp_path / "deps-mcp" / "pyproject.toml").read_text()
+        content = (tmp_path / "deps-mcp" / "pyproject.toml").read_text(encoding="utf-8")
         assert "httpx>=0.27" in content
         assert "beautifulsoup4>=4.12" in content
 
@@ -116,7 +116,7 @@ class TestScaffold:
         )
         MCPServerScaffold(config).generate()
 
-        content = (tmp_path / "custom-mcp" / "src" / "custom_mcp" / "server.py").read_text()
+        content = (tmp_path / "custom-mcp" / "src" / "custom_mcp" / "server.py").read_text(encoding="utf-8")
         assert "Custom server" in content
 
     def test_hyphenated_name_to_package(self, tmp_path):
