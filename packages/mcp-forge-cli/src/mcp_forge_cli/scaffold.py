@@ -11,7 +11,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
-from jinja2 import ChoiceLoader, Environment, FileSystemLoader
+from jinja2 import ChoiceLoader, FileSystemLoader
+from jinja2.sandbox import SandboxedEnvironment
 
 logger = logging.getLogger(__name__)
 
@@ -54,8 +55,8 @@ class MCPServerScaffold:
         self._config = config
         self._env = self._create_env()
 
-    def _create_env(self) -> Environment:
-        """Build Jinja2 environment with optional custom template directory."""
+    def _create_env(self) -> SandboxedEnvironment:
+        """Build sandboxed Jinja2 environment with optional custom template directory."""
         loaders = []
 
         if self._config.custom_templates_dir:
@@ -63,7 +64,7 @@ class MCPServerScaffold:
 
         loaders.append(FileSystemLoader(str(_TEMPLATES_DIR)))
 
-        return Environment(
+        return SandboxedEnvironment(
             loader=ChoiceLoader(loaders),
             keep_trailing_newline=True,
             trim_blocks=True,
@@ -77,7 +78,12 @@ class MCPServerScaffold:
             Path to the created server directory.
         """
         cfg = self._config
-        server_dir = Path(cfg.output_dir) / cfg.server_name
+        server_dir = (Path(cfg.output_dir) / cfg.server_name).resolve()
+        parent_dir = Path(cfg.output_dir).resolve()
+        if not str(server_dir).startswith(str(parent_dir)):
+            raise ValueError(
+                f"Server directory {server_dir} escapes output directory {parent_dir}"
+            )
         pkg_name = cfg.server_name.replace("-", "_")
 
         context = self._build_context(cfg, pkg_name)

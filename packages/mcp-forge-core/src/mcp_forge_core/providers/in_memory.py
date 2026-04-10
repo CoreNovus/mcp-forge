@@ -30,12 +30,17 @@ logger = logging.getLogger(__name__)
 class InMemoryCache(BaseCacheProvider):
     """Dict-based cache for local development and testing.
 
-    Supports TTL via expiry timestamps. Not thread-safe — suitable for
-    single-process dev servers and unit tests.
+    Supports TTL via expiry timestamps and optional max size with
+    oldest-first eviction. Not thread-safe — suitable for single-process
+    dev servers and unit tests.
+
+    Args:
+        max_size: Maximum number of entries. 0 means unlimited.
     """
 
-    def __init__(self) -> None:
+    def __init__(self, max_size: int = 0) -> None:
         self._store: dict[str, tuple[Any, float | None]] = {}
+        self._max_size = max_size
 
     async def get(self, key: str) -> Any | None:
         entry = self._store.get(key)
@@ -50,6 +55,9 @@ class InMemoryCache(BaseCacheProvider):
     async def put(self, key: str, data: Any, ttl_seconds: int | None = None) -> None:
         expires_at = time.time() + ttl_seconds if ttl_seconds else None
         self._store[key] = (data, expires_at)
+        if self._max_size > 0 and len(self._store) > self._max_size:
+            oldest_key = next(iter(self._store))
+            del self._store[oldest_key]
 
     async def delete(self, key: str) -> bool:
         return self._store.pop(key, None) is not None
@@ -91,10 +99,15 @@ class InMemoryTelemetry(BaseTelemetryProvider):
 
     Useful for local development (metrics appear in logs) and testing
     (inspect ``metrics`` list to verify tool invocations).
+
+    Args:
+        max_metrics: Maximum stored metrics. Oldest are dropped when exceeded.
+                     0 means unlimited.
     """
 
-    def __init__(self) -> None:
+    def __init__(self, max_metrics: int = 0) -> None:
         self.metrics: list[dict] = []
+        self._max_metrics = max_metrics
 
     async def emit_metric(
         self,
@@ -111,6 +124,8 @@ class InMemoryTelemetry(BaseTelemetryProvider):
             "timestamp": datetime.now(timezone.utc).isoformat(),
         }
         self.metrics.append(record)
+        if self._max_metrics > 0 and len(self.metrics) > self._max_metrics:
+            self.metrics = self.metrics[-self._max_metrics:]
         logger.debug("metric: %s=%s %s %s", name, value, unit, dimensions or "")
 
     def clear(self) -> None:
