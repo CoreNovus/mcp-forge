@@ -3,23 +3,22 @@
 ToolContext bundles providers, telemetry, caching, and compaction into a single
 object that tools receive. It eliminates the boilerplate found in every tool:
 
-**Before (typical MCP tool):**
+**Before (typical MCP tool without ToolContext):**
 
     @mcp.tool()
-    async def extract_profile(raw_text: str) -> dict:
-        cache = DynamoCache(table_name=..., ...)
-        cache_key = hashlib.sha256(raw_text.encode()).hexdigest()
+    async def analyze(query: str) -> dict:
+        cache_key = hashlib.sha256(query.encode()).hexdigest()
         cached = await cache.get(cache_key)
         if cached:
             return cached
         start = time.perf_counter()
         try:
-            result = await bedrock.invoke(PROMPT, raw_text)
+            result = await llm.invoke(PROMPT, query)
             duration = (time.perf_counter() - start) * 1000
-            telemetry.emit_tool_invocation("extract_profile", True, duration)
+            telemetry.emit_tool_invocation("analyze", True, duration)
         except Exception:
             duration = (time.perf_counter() - start) * 1000
-            telemetry.emit_tool_invocation("extract_profile", False, duration)
+            telemetry.emit_tool_invocation("analyze", False, duration)
             raise
         await cache.put(cache_key, result)
         if store:
@@ -30,13 +29,13 @@ object that tools receive. It eliminates the boilerplate found in every tool:
 **After (with ToolContext):**
 
     @mcp.tool()
-    async def extract_profile(raw_text: str) -> dict:
-        async with ctx.measured("extract_profile"):
+    async def analyze(query: str) -> dict:
+        async with ctx.measured("analyze"):
             result = await ctx.cached(
-                key=ctx.hash_key(raw_text),
-                fn=lambda: bedrock.invoke(PROMPT, raw_text),
+                key=ctx.hash_key(query),
+                fn=lambda: llm.invoke(PROMPT, query),
             )
-            return ctx.compacted(result, summary=f"Profile: {result.get('name')}")
+            return await ctx.compacted(result, summary=f"Found {len(result['items'])} results")
 """
 
 from __future__ import annotations
@@ -82,8 +81,8 @@ class ToolContext:
         )
 
         # In a tool function:
-        result = await ctx.cached("profile:abc123", compute_profile)
-        return ctx.compacted(result, summary="Extracted 5 skills")
+        result = await ctx.cached("query:abc123", compute_result)
+        return await ctx.compacted(result, summary="Found 10 items")
     """
 
     __slots__ = ("cache", "session", "telemetry", "store", "_extra")
@@ -204,8 +203,8 @@ class ToolContext:
         Example::
 
             return await ctx.compacted(
-                profile_data,
-                summary=f"Profile: {name}, {len(skills)} skills",
+                result_data,
+                summary=f"Processed {len(result_data.get('items', []))} items",
             )
         """
         if self.store is None:

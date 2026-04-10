@@ -12,7 +12,7 @@ They are designed to compose cleanly::
     @measured(telemetry)
     @cached_tool(cache, ttl=3600)
     @compacted(store, summary_fn=lambda r: f"Found {len(r['items'])} items")
-    async def search_jobs(query: str) -> dict:
+    async def search(query: str) -> dict:
         return await llm.invoke(...)
 
 Each decorator is independent — use one, two, or all three.
@@ -44,7 +44,7 @@ def measured(telemetry: BaseTelemetryProvider) -> Callable:
 
         @mcp.tool()
         @measured(telemetry)
-        async def parse_document(content: str) -> dict:
+        async def my_tool(content: str) -> dict:
             ...
     """
 
@@ -145,10 +145,10 @@ def compacted(
     Example::
 
         @mcp.tool()
-        @compacted(store, summary_fn=lambda r: f"Profile: {r.get('name')}")
-        async def extract_profile(text: str) -> dict:
-            return {"name": "Alice", "skills": [...]}
-            # → actually returns {"ref_id": "td_...", "summary": "Profile: Alice"}
+        @compacted(store, summary_fn=lambda r: f"Found {r['count']} results")
+        async def search(query: str) -> dict:
+            return {"count": 42, "items": [...]}
+            # → actually returns {"ref_id": "td_...", "summary": "Found 42 results"}
     """
 
     def decorator(fn: Callable) -> Callable:

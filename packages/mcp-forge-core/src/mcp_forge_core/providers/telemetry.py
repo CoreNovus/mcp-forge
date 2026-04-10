@@ -9,7 +9,7 @@ The base class provides two ready-to-use conveniences:
 
 Example::
 
-    async with telemetry.measure_tool("parse_document") as ctx:
+    async with telemetry.measure_tool("my_tool") as ctx:
         result = await do_work()
         ctx["success"] = True          # mark success before exiting
 """
@@ -87,8 +87,8 @@ class BaseTelemetryProvider(ABC):
 
         Example::
 
-            async with telemetry.measure_tool("extract_profile") as ctx:
-                profile = await run_extraction()
+            async with telemetry.measure_tool("analyze") as ctx:
+                result = await do_work()
                 ctx["success"] = True
 
         Args:

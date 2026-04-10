@@ -12,7 +12,7 @@ Example::
     await telemetry.emit_metric("tool.invocation", 1.0, "Count")
 
     # Or use the built-in context manager:
-    async with telemetry.measure_tool("parse_document") as ctx:
+    async with telemetry.measure_tool("my_tool") as ctx:
         result = await do_work()
         ctx["success"] = True
 """

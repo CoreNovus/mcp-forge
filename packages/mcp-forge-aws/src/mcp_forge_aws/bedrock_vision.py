@@ -6,7 +6,7 @@ Supports 12 document types with type-specific extraction schemas.
 Example::
 
     vision = BedrockVisionProvider()
-    result = await vision.extract_structured(image_bytes, "invoice")
+    result = await vision.extract_structured(image_bytes, "receipt")
     print(result.data)  # {"vendor": "...", "total": "...", ...}
 """
 
