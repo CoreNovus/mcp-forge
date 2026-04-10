@@ -113,15 +113,13 @@ def cached_tool(
             # Check cache
             hit = await cache.get(cache_key)
             if hit is not None:
-                return {**hit, "_cache_hit": True}
+                if isinstance(hit, dict):
+                    return {**hit, "_cache_hit": True}
+                return hit
 
-            # Compute
+            # Compute and store
             result = await fn(*args, **kwargs)
-
-            # Store (only cache dicts)
-            if isinstance(result, dict):
-                await cache.put(cache_key, result, ttl_seconds=ttl)
-
+            await cache.put(cache_key, result, ttl_seconds=ttl)
             return result
 
         return wrapper

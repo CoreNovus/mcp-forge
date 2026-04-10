@@ -134,8 +134,8 @@ class TestCachedTool:
         await expiring(x="a")
         assert call_count == 2  # both calls computed because TTL expired
 
-    async def test_non_dict_result_not_cached(self):
-        """Non-dict return values should pass through without caching."""
+    async def test_non_dict_result_is_cached(self):
+        """Non-dict return values are also cached (cache accepts Any)."""
         cache = InMemoryCache()
         call_count = 0
 
@@ -146,13 +146,10 @@ class TestCachedTool:
             return f"result: {x}"
 
         r1 = await returns_string(x="a")
-        await returns_string(x="a")
+        r2 = await returns_string(x="a")
         assert r1 == "result: a"
-        # String doesn't get cached (only dicts are cached),
-        # but the key hashing still returns the cached None → recomputes
-        # Actually it checks cache.get which returns None → calls fn
-        # The result is a string so isinstance(result, dict) is False → not stored
-        assert call_count == 2
+        assert r2 == "result: a"
+        assert call_count == 1  # second call served from cache
 
     async def test_exception_not_cached(self):
         cache = InMemoryCache()

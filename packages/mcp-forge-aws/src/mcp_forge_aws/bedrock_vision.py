@@ -55,14 +55,17 @@ def _detect_media_type(data: bytes) -> str:
 class BedrockVisionProvider(BaseVisionProvider):
     """Amazon Bedrock Claude Vision provider for structured data extraction.
 
-    Supports 12 document types with pre-configured extraction schemas.
-    Uses anti-hallucination prompting to ensure only visible data is extracted.
+    Includes 12 pre-configured extraction schemas by default. Pass custom
+    schemas to override or extend.
 
     Args:
         model_id: Bedrock vision model ID.
         region: AWS region for Bedrock.
         endpoint_url: Optional endpoint override.
         max_tokens: Maximum response tokens.
+        schemas: Custom extraction schemas. Merged with defaults — pass
+                 ``schemas={"custom_type": ["field1", "field2"]}`` to add
+                 new types, or override existing ones.
         session: Optional shared aioboto3.Session.
     """
 
@@ -72,12 +75,14 @@ class BedrockVisionProvider(BaseVisionProvider):
         region: str = "us-east-1",
         endpoint_url: str | None = None,
         max_tokens: int = 8192,
+        schemas: dict[str, list[str]] | None = None,
         session: aioboto3.Session | None = None,
     ) -> None:
         self._model_id = model_id
         self._region = region
         self._endpoint_url = endpoint_url
         self._max_tokens = max_tokens
+        self._schemas = {**_EXTRACTION_SCHEMAS, **(schemas or {})}
         self._session = session or aioboto3.Session()
 
     def _client_kwargs(self) -> dict[str, Any]:
@@ -95,11 +100,11 @@ class BedrockVisionProvider(BaseVisionProvider):
         language_hint: str | None = None,
     ) -> VisionExtractionResult:
         """Extract structured data from a document image using Claude Vision."""
-        fields = custom_fields or _EXTRACTION_SCHEMAS.get(extraction_type)
+        fields = custom_fields or self._schemas.get(extraction_type)
         if fields is None:
             raise ValueError(
                 f"Unknown extraction type '{extraction_type}'. "
-                f"Supported: {', '.join(sorted(_EXTRACTION_SCHEMAS))}. "
+                f"Supported: {', '.join(sorted(self._schemas))}. "
                 f"Or provide custom_fields."
             )
 
@@ -155,7 +160,7 @@ class BedrockVisionProvider(BaseVisionProvider):
 
     def get_supported_types(self) -> list[str]:
         """Return sorted list of supported extraction types."""
-        return sorted(_EXTRACTION_SCHEMAS)
+        return sorted(self._schemas)
 
 
 def _parse_json(text: str) -> dict[str, Any]:

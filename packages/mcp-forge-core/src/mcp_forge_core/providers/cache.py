@@ -9,11 +9,13 @@ Similar to Django's BaseCache backend pattern.
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
+from typing import Any
 
 
 class BaseCacheProvider(ABC):
     """Base class for cache backends.
 
+    Stores any JSON-serializable value (dicts, lists, strings, numbers).
     Subclass and implement the three abstract methods to integrate any
     cache system (Redis, Memcached, DynamoDB, etc.).
 
@@ -32,24 +34,24 @@ class BaseCacheProvider(ABC):
     """
 
     @abstractmethod
-    async def get(self, key: str) -> dict | None:
+    async def get(self, key: str) -> Any | None:
         """Retrieve a cached value by key.
 
         Args:
             key: The cache key.
 
         Returns:
-            The cached dict, or None if not found or expired.
+            The cached value (dict, list, str, etc.), or None if not found or expired.
         """
         ...
 
     @abstractmethod
-    async def put(self, key: str, data: dict, ttl_seconds: int | None = None) -> None:
+    async def put(self, key: str, data: Any, ttl_seconds: int | None = None) -> None:
         """Store a value with optional TTL.
 
         Args:
             key: The cache key.
-            data: The dict to store.
+            data: Any JSON-serializable value.
             ttl_seconds: Optional time-to-live in seconds. None means no expiry.
         """
         ...
@@ -66,7 +68,7 @@ class BaseCacheProvider(ABC):
         """
         ...
 
-    async def get_or_default(self, key: str, default: dict) -> dict:
+    async def get_or_default(self, key: str, default: Any) -> Any:
         """Get a value, returning a default if not found.
 
         Args:
@@ -74,7 +76,7 @@ class BaseCacheProvider(ABC):
             default: Value to return if key is not found.
 
         Returns:
-            The cached dict or the default.
+            The cached value or the default.
         """
         result = await self.get(key)
         return result if result is not None else default

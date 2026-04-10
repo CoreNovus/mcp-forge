@@ -74,9 +74,6 @@ def create_mcp_app(
         format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
         handlers=[logging.StreamHandler(sys.stderr)],
     )
-    # Quiet noisy libraries
-    for noisy in ("boto3", "botocore", "urllib3", "httpcore", "httpx"):
-        logging.getLogger(noisy).setLevel(logging.WARNING)
 
     mcp = FastMCP(server_name, instructions=description)
     mcp.providers = providers or {}  # type: ignore[attr-defined]

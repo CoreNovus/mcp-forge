@@ -18,6 +18,7 @@ from __future__ import annotations
 import logging
 import time
 from datetime import datetime, timezone
+from typing import Any
 
 from .cache import BaseCacheProvider
 from .session import BaseSessionProvider, Session
@@ -34,9 +35,9 @@ class InMemoryCache(BaseCacheProvider):
     """
 
     def __init__(self) -> None:
-        self._store: dict[str, tuple[dict, float | None]] = {}
+        self._store: dict[str, tuple[Any, float | None]] = {}
 
-    async def get(self, key: str) -> dict | None:
+    async def get(self, key: str) -> Any | None:
         entry = self._store.get(key)
         if entry is None:
             return None
@@ -46,7 +47,7 @@ class InMemoryCache(BaseCacheProvider):
             return None
         return data
 
-    async def put(self, key: str, data: dict, ttl_seconds: int | None = None) -> None:
+    async def put(self, key: str, data: Any, ttl_seconds: int | None = None) -> None:
         expires_at = time.time() + ttl_seconds if ttl_seconds else None
         self._store[key] = (data, expires_at)
 
