@@ -1,0 +1,3 @@
+# Default reviewer on every PR. Update to the GitHub handle(s) or team(s)
+# that should be auto-requested on fork PRs.
+*       @CoreNovus/maintainers
