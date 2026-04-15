@@ -65,6 +65,7 @@ def new(
 def version_cmd() -> None:
     """Show mcp-forge version."""
     from mcp_forge_core import __version__ as core_version
+    from mcp_forge_cli import __version__ as cli_version
 
     click.echo(f"mcp-forge-core: {core_version}")
-    click.echo(f"mcp-forge-cli:  {ScaffoldConfig.__module__.split('.')[0]}")
+    click.echo(f"mcp-forge-cli:  {cli_version}")

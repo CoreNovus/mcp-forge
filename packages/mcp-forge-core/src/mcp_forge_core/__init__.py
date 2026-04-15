@@ -34,6 +34,7 @@ Composable decorators::
     from mcp_forge_core.decorators import measured, cached_tool, compacted
 """
 
+from mcp.server.fastmcp import FastMCP
 from .config import MCPServerConfig, get_mcp_config
 from .server_factory import create_mcp_app, run_server, get_http_app
 from .circuit_breaker import CircuitBreaker, CircuitState, CircuitOpenError
@@ -46,6 +47,8 @@ from .similarity import cosine_similarity, semantic_match, ScoredItem
 __version__ = "0.1.0"
 
 __all__ = [
+    # MCP
+    "FastMCP",
     # Config
     "MCPServerConfig",
     "get_mcp_config",

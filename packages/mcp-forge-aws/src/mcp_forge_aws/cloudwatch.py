@@ -25,7 +25,7 @@ from datetime import datetime, timezone
 from typing import Any
 
 import boto3
-from botocore.exceptions import ClientError
+from botocore.exceptions import BotoCoreError, ClientError
 
 from mcp_forge_core.providers.telemetry import BaseTelemetryProvider
 
@@ -97,15 +97,12 @@ class CloudWatchTelemetryProvider(BaseTelemetryProvider):
             )
 
         try:
-            loop = asyncio.get_running_loop()
-            await loop.run_in_executor(
-                None,
-                lambda: self._get_client().put_metric_data(
-                    Namespace=self._namespace,
-                    MetricData=[metric_data],
-                ),
+            await asyncio.to_thread(
+                self._get_client().put_metric_data,
+                Namespace=self._namespace,
+                MetricData=[metric_data],
             )
-        except (ClientError, Exception) as e:
+        except (ClientError, BotoCoreError) as e:
             logger.warning("Failed to emit metric %s: %s", name, e)
 
     def __repr__(self) -> str:

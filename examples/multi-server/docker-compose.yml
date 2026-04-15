@@ -1,0 +1,67 @@
+# docker-compose for the three scaffolded MCP servers.
+#
+# Prerequisite: run `mcp-forge new search-mcp`, `mcp-forge new knowledge-mcp`,
+# and `mcp-forge new metrics-mcp` in this directory first, so the three source
+# trees exist next to this file.
+#
+# Then: `docker-compose up --build`
+
+version: "3.9"
+
+services:
+  search-mcp:
+    build:
+      context: ./search-mcp
+      dockerfile: ../Dockerfile
+      args:
+        PKG_NAME: search_mcp
+    image: mcp-forge/search-mcp:dev
+    environment:
+      MCP_SERVER_MODE: http
+      MCP_SERVER_HOST: 0.0.0.0
+      MCP_SERVER_PORT: "8000"
+      MCP_LOG_LEVEL: INFO
+    ports:
+      - "8001:8000"
+
+  knowledge-mcp:
+    build:
+      context: ./knowledge-mcp
+      dockerfile: ../Dockerfile
+      args:
+        PKG_NAME: knowledge_mcp
+    image: mcp-forge/knowledge-mcp:dev
+    environment:
+      MCP_SERVER_MODE: http
+      MCP_SERVER_HOST: 0.0.0.0
+      MCP_SERVER_PORT: "8000"
+      MCP_LOG_LEVEL: INFO
+    ports:
+      - "8002:8000"
+
+  metrics-mcp:
+    build:
+      context: ./metrics-mcp
+      dockerfile: ../Dockerfile
+      args:
+        PKG_NAME: metrics_mcp
+    image: mcp-forge/metrics-mcp:dev
+    environment:
+      MCP_SERVER_MODE: http
+      MCP_SERVER_HOST: 0.0.0.0
+      MCP_SERVER_PORT: "8000"
+      MCP_LOG_LEVEL: INFO
+    ports:
+      - "8003:8000"
+
+  # Uncomment to run DynamoDB/CloudWatch-backed providers locally via LocalStack.
+  # You'll also need to set MCP_AWS_ENDPOINT_URL=http://localstack:4566 on the
+  # services above.
+  #
+  # localstack:
+  #   image: localstack/localstack:latest
+  #   environment:
+  #     SERVICES: dynamodb,cloudwatch,s3,transcribe
+  #     DEFAULT_REGION: us-east-1
+  #   ports:
+  #     - "4566:4566"

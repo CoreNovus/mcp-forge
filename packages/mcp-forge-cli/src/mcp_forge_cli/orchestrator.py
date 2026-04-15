@@ -11,7 +11,7 @@ from pathlib import Path
 
 from .registry import BaseRegistryTarget, NoOpRegistry
 from .scaffold import MCPServerScaffold, ScaffoldConfig
-from .validators import validate_output_dir, validate_server_name
+from .validators import validate_output_dir, validate_server_name, validate_text_field
 
 logger = logging.getLogger(__name__)
 
@@ -47,6 +47,15 @@ class ForgeOrchestrator:
         dir_error = validate_output_dir(config.output_dir, config.server_name)
         if dir_error:
             raise ValueError(dir_error)
+
+        for field_name, value in [
+            ("author", config.author),
+            ("email", config.email),
+            ("description", config.description),
+        ]:
+            text_error = validate_text_field(value, field_name)
+            if text_error:
+                raise ValueError(text_error)
 
         # 2. Scaffold
         scaffold = MCPServerScaffold(config)

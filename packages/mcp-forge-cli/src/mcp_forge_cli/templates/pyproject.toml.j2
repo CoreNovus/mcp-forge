@@ -12,7 +12,6 @@ authors = [{ name = "{{ author }}"{% if email %}, email = "{{ email }}"{% endif 
 {% endif %}
 dependencies = [
     "mcp-forge-core>=0.1.0",
-    "mcp>=1.0,<2.0",
     "uvicorn[standard]>=0.27.0",
 {% for dep in extra_deps %}
     "{{ dep }}",

@@ -59,6 +59,33 @@ def _calculate_delay(attempt: int, config: RetryConfig) -> float:
     return delay
 
 
+async def _execute_with_retry(
+    fn: Callable[..., Any],
+    args: tuple[Any, ...],
+    kwargs: dict[str, Any],
+    config: RetryConfig,
+) -> Any:
+    """Core retry loop shared by the decorator and with_retry()."""
+    last_exception: Exception | None = None
+    for attempt in range(config.max_attempts):
+        try:
+            return await fn(*args, **kwargs)
+        except config.retryable_exceptions as exc:
+            last_exception = exc
+            if attempt < config.max_attempts - 1:
+                delay = _calculate_delay(attempt, config)
+                logger.warning(
+                    "Retry %d/%d for %s after %.2fs: %s",
+                    attempt + 1,
+                    config.max_attempts,
+                    getattr(fn, "__name__", str(fn)),
+                    delay,
+                    type(exc).__name__,
+                )
+                await asyncio.sleep(delay)
+    raise last_exception  # type: ignore[misc]
+
+
 def retry(
     func: F | None = None,
     *,
@@ -106,24 +133,7 @@ def retry(
     def decorator(fn: F) -> F:
         @functools.wraps(fn)
         async def wrapper(*args: Any, **kwargs: Any) -> Any:
-            last_exception: Exception | None = None
-            for attempt in range(config.max_attempts):
-                try:
-                    return await fn(*args, **kwargs)
-                except config.retryable_exceptions as exc:
-                    last_exception = exc
-                    if attempt < config.max_attempts - 1:
-                        delay = _calculate_delay(attempt, config)
-                        logger.warning(
-                            "Retry %d/%d for %s after %.2fs: %s",
-                            attempt + 1,
-                            config.max_attempts,
-                            fn.__name__,
-                            delay,
-                            exc,
-                        )
-                        await asyncio.sleep(delay)
-            raise last_exception  # type: ignore[misc]
+            return await _execute_with_retry(fn, args, kwargs, config)
 
         return wrapper  # type: ignore[return-value]
 
@@ -153,23 +163,4 @@ async def with_retry(
     Returns:
         The return value of fn.
     """
-    cfg = config or RetryConfig()
-
-    last_exception: Exception | None = None
-    for attempt in range(cfg.max_attempts):
-        try:
-            return await fn(*args, **kwargs)
-        except cfg.retryable_exceptions as exc:
-            last_exception = exc
-            if attempt < cfg.max_attempts - 1:
-                delay = _calculate_delay(attempt, cfg)
-                logger.warning(
-                    "Retry %d/%d for %s after %.2fs: %s",
-                    attempt + 1,
-                    cfg.max_attempts,
-                    fn.__name__,
-                    delay,
-                    exc,
-                )
-                await asyncio.sleep(delay)
-    raise last_exception  # type: ignore[misc]
+    return await _execute_with_retry(fn, args, kwargs, config or RetryConfig())
