@@ -8,6 +8,7 @@ We'd love your help making mcp-forge better. Whether it's a bug fix, new provide
 # 1. Fork this repo on GitHub, then:
 git clone git@github.com:<your-username>/mcp-forge.git
 cd mcp-forge
+git remote add upstream https://github.com/CoreNovus/mcp-forge.git
 
 # 2. Install everything
 pip install -e packages/mcp-forge-core[dev]
@@ -21,7 +22,19 @@ pytest packages/mcp-forge-aws/tests/
 pytest packages/mcp-forge-cli/tests/
 ```
 
+Keep your fork in sync before starting work:
+
+```bash
+git fetch upstream
+git checkout main
+git merge --ff-only upstream/main
+```
+
 That's it. You're ready to contribute.
+
+> **First-time contributors:** a maintainer has to click **Approve and run**
+> on your first PR before CI kicks off. This is GitHub's default safety
+> behaviour for fork PRs — not a slight.
 
 ## How to Contribute
 
